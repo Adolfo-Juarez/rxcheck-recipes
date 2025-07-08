@@ -1,0 +1,7 @@
+import Recipe from "../model/Recipe";
+
+export default interface RecipeRepository {
+    save(recipe: Omit<Recipe, 'id'>): Promise<Recipe | null>
+    getByPatientId(patient_id: string): Promise<Recipe[] | null>
+    getById(id: number): Promise<Recipe | null>
+}
