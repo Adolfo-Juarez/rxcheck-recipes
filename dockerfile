@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install only production dependencies
-RUN npm install --only=production
+# Install ALL dependencies (including devDependencies for building)
+RUN npm install
 
 # Copy remaining files
 COPY . .
@@ -24,14 +24,14 @@ FROM node:18-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy only production dependencies from builder
-COPY --from=builder /app/node_modules ./node_modules
+# Copy package files
+COPY package*.json ./
+
+# Install only production dependencies
+RUN npm install --only=production
 
 # Copy built dist folder
 COPY --from=builder /app/dist ./dist
-
-# Copy other files needed to run (optional: package.json for logging, etc.)
-COPY package*.json ./
 
 # Set environment
 ENV NODE_ENV=production

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receta Médica - México</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .receta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border: 2px solid #333;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #647be1;
+            font-size: 24px;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .header p {
+            margin: 5px 0;
+            font-size: 12px;
+            color: #666;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .section-title {
+            background-color: #647be1;
+            color: white;
+            padding: 8px 12px;
+            margin: -15px -15px 15px -15px;
+            font-weight: 600;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex: 100%;
+        }
+
+        .form-group.half-width {
+            flex: 48%;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 3px;
+            font-size: 12px;
+            color: #333;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="tel"],
+        textarea,
+        select {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #333;
+            padding: 5px 0;
+            font-size: 14px;
+            background: transparent;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        textarea {
+            border: 1px solid #333;
+            padding: 8px;
+            min-height: 60px;
+            resize: vertical;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .prescription-area {
+            min-height: 200px;
+            border: 2px solid #333;
+            padding: 15px;
+            margin: 20px 0;
+        }
+
+        .prescription-title {
+            text-align: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #647be1;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .medication-item {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+
+        .medication-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .medication-number {
+            font-weight: 600;
+            color: #647be1;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .signature-area {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 200px;
+        }
+
+        .signature-box p {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+        }
+
+        .signature-box small {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 300;
+        }
+
+        .signature-line {
+            border-top: 1px solid #333;
+            margin-bottom: 5px;
+            height: 50px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .required {
+            color: red;
+        }
+
+        .validity-info {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            margin-top: 15px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .validity-info strong {
+            font-weight: 600;
+        }
+
+        /* Estilos específicos para el área de sello */
+        .signature-area>div[style*="text-align: center"] p {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Estilos para el código QR */
+        .qr-code-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .qr-placeholder {
+            width: 120px;
+            height: 120px;
+            border: 2px solid #647be1;
+            background-color: #f8f9ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            margin: 0 auto;
+        }
+
+        .qr-loading {
+            text-align: center;
+            color: #647be1;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .generate-qr-btn {
+            background-color: #647be1;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .generate-qr-btn:hover {
+            background-color: #5a6bcc;
+        }
+
+        .digital-seal {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #647be1;
+            border-radius: 50%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8f9ff;
+        }
+
+        .seal-content {
+            text-align: center;
+            color: #647be1;
+        }
+
+        .seal-content p {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        /* Estilos para quiebres de página condicionales */
+        .avoid-break {
+            page-break-inside: avoid;
+        }
+
+        .avoid-break-before {
+            page-break-before: avoid;
+        }
+
+        .avoid-break-after {
+            page-break-after: avoid;
+        }
+
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+
+            .receta-container {
+                box-shadow: none;
+                border: 2px solid #000;
+            }
+
+            .avoid-break {
+                page-break-inside: avoid;
+            }
+
+            .avoid-break-before {
+                page-break-before: avoid;
+            }
+
+            .avoid-break-after {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="receta-container">
+        <div class="header">
+            <h1>RECETA MÉDICA</h1>
+            <p>Conforme a la Farmacopea de los Estados Unidos Mexicanos (FEUM)</p>
+            <p>NOM-001-SSA1-2020</p>
+        </div>
+
+        <!-- Datos del Médico -->
+        <div class="section avoid-break">
+            <div class="section-title">DATOS DEL MÉDICO PRESCRIPTOR</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre Completo <span class="required">*</span></label>
+                    <input type="text" name="medico_nombre" disabled value="{{ practitioner_name }}">
+                </div>
+                <div class="form-group">
+                    <label>Cédula Profesional <span class="required">*</span></label>
+                    <input type="text" name="cedula_profesional" disabled value="{{practitioner_license}}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Profesión <span class="required">*</span></label>
+                    <input type="text" name="cedula_profesional" disabled value="{{practitioner_area}}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="text" disabled value="{{practitioner_phone}}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>Domicilio del Establecimiento de Atención Médica <span class="required">*</span></label>
+                    <input type="text" name="domicilio_establecimiento" disabled value="{{practitioner_place}}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Fecha de Expedición -->
+        <div class="section avoid-break">
+            <div class="section-title">FECHA DE EXPEDICIÓN</div>
+            <div class="form-row">
+                <div class="form-group half-width">
+                    <label>Fecha <span class="required">*</span></label>
+                    <input type="date" disabled name="fecha_expedicion" value="{{issue_at}}">
+                </div>
+                <div class="form-group half-width">
+                    <label>Expiración</label>
+                    <input type="date" name="lugar_expedicion" disabled value="{{expire_at}}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Datos del Paciente -->
+        <div class="section avoid-break">
+            <div class="section-title">DATOS DEL PACIENTE</div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nombre Completo <span class="required">*</span></label>
+                    <input type="text" name="paciente_nombre" disabled value="{{patient_name}}">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Nacimiento <span class="required">*</span></label>
+                    <input type="date" name="paciente_fecha_nacimiento" disabled value="{{patient_birthdate}}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Peso (kg)</label>
+                    <input type="text" name="paciente_peso" value={{patient_weight}} disabled>
+                </div>
+                <div class="form-group">
+                    <label>Talla (cm)</label>
+                    <input type="text" name="paciente_talla" value={{patient_height}} disabled>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label>Domicilio (Obligatorio para medicamentos Fracción I)</label>
+                    <input type="text" name="paciente_domicilio" value="{{patient_address}}" disabled>
+                </div>
+            </div>
+
+            <div class="form-row avoid-break">
+                <div class="form-group full-width">
+                    <label>Diagnóstico (Obligatorio para medicamentos Fracción I)</label>
+                    <textarea name="diagnostico" disabled rows="8" cols="80">{{patient_diagnostic}}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescripción -->
+        <div class="prescription-area avoid-break">
+            <div class="prescription-title">PRESCRIPCIÓN MÉDICA</div>
+
+            <!-- Bucle para múltiples medicamentos -->
+            {{#each medications}}
+            <div class="medication-item avoid-break">
+                <div class="medication-number">Medicamento {{inc @index}}</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nombre del medicamento</label>
+                        <input type="text" name="denominacion_distintiva" disabled value="{{medication_name}}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Concentración <span class="required">*</span></label>
+                        <input type="text" name="concentracion" disabled value="{{medication_strength}}">
+                    </div>
+                    <div class="form-group">
+                        <label>Forma Farmacéutica <span class="required">*</span></label>
+                        <input type="text" name="forma_farmaceutica" disabled value="{{medication_form}}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Dosis <span class="required">*</span></label>
+                        <input type="text" name="dosis" placeholder="No usar abreviaturas" disabled value="{{medication_dosis}}">
+                    </div>
+                    <div class="form-group">
+                        <label>Vía de Administración <span class="required">*</span></label>
+                        <input type="text" name="via_administracion" placeholder="Ej: Oral, Intravenosa, Tópica" disabled value="{{medication_via}}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Frecuencia <span class="required">*</span></label>
+                        <input type="text" name="frecuencia" placeholder="Evitar abreviaturas" disabled value="{{medication_frecuency}}">
+                    </div>
+                    <div class="form-group">
+                        <label>Duración del Tratamiento <span class="required">*</span></label>
+                        <input type="text" name="duracion_tratamiento" disabled value="{{medication_duration}}">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>Indicaciones Completas y Claras <span class="required">*</span></label>
+                        <textarea name="indicaciones" placeholder="Instrucciones detalladas para la administración del medicamento. No usar abreviaturas." disabled>{{medication_instruction}}</textarea>
+                    </div>
+                </div>
+
+                {{#unless @last}}
+                <hr style="margin-top: 20px; border-color: #ddd;">
+                {{/unless}}
+            </div>
+            {{/each}}
+        </div>
+
+        <!-- Información de Validez -->
+        <div class="validity-info page-break">
+            <strong>Vigencia de la receta:</strong><br>
+            • Fracción I (Estupefacientes): Requiere receta especial, máximo 30 días<br>
+            • Fracción II (Psicotrópicos): 30 días naturales<br>
+            • Fracción III: 6 meses<br>
+            • Fracciones IV, V, VI: Según indicación médica
+        </div>
+
+        <!-- Área de Firma -->
+        <div class="signature-area">
+            <div class="signature-box">
+                <div class="qr-code-container">
+                    <div id="qr-code" class="qr-placeholder">
+                        <!-- El código QR se generará aquí -->
+                        <img src="{{qr_validatio_image}}" width=115px height=115px style="position:absolute">
+                        <div class="qr-loading">
+                            <p>Código QR<br>de Validación</p>
+                        </div>
+                    </div>
+                </div>
+                <p><strong>Firma Digital del Médico</strong><br>
+                    <small>(Código QR de validación)</small>
+                </p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>IMPORTANTE:</strong> Esta receta debe cumplir con todos los requisitos establecidos en la FEUM y la NOM-001-SSA1-2020.<br>
+                Los campos marcados con <span class="required">*</span> son obligatorios. Para medicamentos controlados pueden aplicar requisitos adicionales.</p>
+        </div>
+    </div>
+</body>
+
+</html>
