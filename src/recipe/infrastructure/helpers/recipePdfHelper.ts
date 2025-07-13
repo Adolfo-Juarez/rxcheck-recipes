@@ -4,10 +4,30 @@ import puppeteer from "puppeteer";
 import Handlebars from "handlebars";
 import RecipePdfService from "../../application/services/recipePdfService";
 import PdfRecipeServiceProps from "../../domain/dto/pdfRecipeServiceProps";
+import QRCode from "qrcode";
 
 export default class RecipePdfHelper implements RecipePdfService {
+  
+  async generateQrCode(data: string): Promise<ArrayBufferLike> {
+    try {
+      // Genera el QR como un buffer de imagen PNG
+      const buffer = await QRCode.toBuffer(data, {
+        type: "png",
+        errorCorrectionLevel: "H",
+        margin: 1,
+        width: 300,
+      });
+
+      return buffer.buffer; // Convertir a ArrayBufferLike
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      throw new Error("Failed to generate QR code");
+    }
+  }
+
   async generatePdf(data: PdfRecipeServiceProps): Promise<ArrayBufferLike> {
     try {
+      console.log(`Medic license A: ${data.practitioner.license}`);
       const htmlPath = path.join(
         __dirname,
         "..",

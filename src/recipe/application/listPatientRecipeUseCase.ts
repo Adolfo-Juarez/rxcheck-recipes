@@ -1,13 +1,13 @@
 import RecipeOverviewResponse from "../domain/dto/recipeOverviewResponse";
 import RecipeMedicationRepository from "../domain/repository/RecipeMedicationRespository";
 import RecipeRepository from "../domain/repository/RecipeRepository";
-import GetMedicationListByIdService from "./services/getMedicationListByIdService";
+import InternalRequestService from "./services/internalRequestService";
 
 export default class ListPatientRecipeUseCase {
   constructor(
     readonly recipeRepository: RecipeRepository,
     readonly recipeMedicationRepository: RecipeMedicationRepository,
-    readonly getMedicationListByIdHelper: GetMedicationListByIdService
+    readonly getMedicationListByIdHelper: InternalRequestService
   ) {}
 
   async run(patient_id: string): Promise<RecipeOverviewResponse[] | null> {

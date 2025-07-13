@@ -5,12 +5,7 @@ import RecipeModel from "./schema/RecipeSchema";
 export default class SequelizeRecipeRepository implements RecipeRepository {
   async save(recipe: Omit<Recipe, "id">): Promise<Recipe | null> {
     try {
-      const result = await RecipeModel.create({
-        patient_id: recipe.patient_id,
-        doctor_id: recipe.doctor_id,
-        issue_at: recipe.issue_at,
-        expires_at: recipe.expires_at,
-      });
+      const result = await RecipeModel.create(recipe);
       return result.toJSON() as Recipe;
     } catch (error: any) {
       return null;

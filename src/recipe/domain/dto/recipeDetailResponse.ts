@@ -1,4 +1,4 @@
-import { MedicationResponse } from "../../application/services/getMedicationListByIdService";
+import { MedicationResponse } from "../../application/services/internalRequestService";
 
 export default interface RecipeDetailResponse {
   id: number;
