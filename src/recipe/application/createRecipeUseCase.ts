@@ -5,6 +5,7 @@ import RecipeRepository from "../domain/repository/RecipeRepository";
 import ExternalRequestHelper from "../infrastructure/helpers/externalRequestHelper";
 import RecipePdfService from "./services/recipePdfService";
 import StorageService from "./services/storageService";
+import crypto from "crypto";
 
 export default class CreateRecipeUseCase {
   constructor(
