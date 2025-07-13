@@ -1,45 +1,41 @@
-# Base image
+# ---------- Builder stage ----------
 FROM node:18-alpine AS builder
 
-# Create app directory
 WORKDIR /app
 
-# Copy package files
+# Copia los archivos de dependencias
 COPY package*.json ./
 
-# Install ALL dependencies (including devDependencies for building)
+# Instala todas las dependencias
 RUN npm install
 
-# Copy remaining files
+# Copia el resto del código fuente
 COPY . .
 
-# Build the application
+# Compila el código
 RUN npm run build
 
-# ------------------------------------------
+# Copia los assets manualmente si no se generan en build
+RUN cp -r src/recipe/assets dist/recipe/assets
 
-# Final image (production)
+
+# ---------- Final image ----------
 FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copia node_modules desde el builder
+COPY --from=builder /app/node_modules ./node_modules
 
-# Install only production dependencies
-RUN npm install --only=production
+# Copia package.json por convención
+COPY --from=builder /app/package.json ./package.json
 
-# Copy built dist folder
+# Copia el código ya compilado
 COPY --from=builder /app/dist ./dist
 
-COPY --from=builder /app/src/recipe/assets ./dist/recipe/assets
-
-# Set environment
+# Setea entorno
 ENV NODE_ENV=production
 
-# Expose port
 EXPOSE 80
 
-# Start the application
 CMD ["npm", "start"]
