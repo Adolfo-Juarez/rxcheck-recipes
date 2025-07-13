@@ -4,6 +4,7 @@ import {
   createController,
   getController,
   listPatientRecipeController,
+  verifyController,
 } from "./dependencies";
 
 const router = Router();
@@ -26,6 +27,12 @@ router.get(
   "/:id",
   authMiddleware.run.bind(authMiddleware),
   getController.run.bind(getController)
+);
+
+router.get(
+  "/verify/:code",
+  authMiddleware.withRole("farmacia"),
+  verifyController.run.bind(verifyController)
 );
 
 export default router;

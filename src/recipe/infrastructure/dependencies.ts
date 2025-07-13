@@ -12,6 +12,8 @@ import SequelizeRecipeMedicationRepository from "./sequelizeRecipeMedicationRepo
 import SequelizeRecipeRepository from "./sequelizeRecipeRepository";
 import InternalRequestHelper from "./helpers/internalRequestHelper";
 import ExternalRequestHelper from "./helpers/externalRequestHelper";
+import { VerifyUseCase } from "../application/verifyUseCase";
+import VerifyController from "./controller/verifyController";
 
 export const internalRequestHelper = new InternalRequestHelper();
 export const externalRequestHelper = new ExternalRequestHelper();
@@ -25,9 +27,11 @@ export const sequelizeIllegalRepository = new SequelizeIllegalRepository();
 export const getRecipeUseCase = new GetRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, internalRequestHelper, storageHelper);
 export const listPatientRecipeUseCase = new ListPatientRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, internalRequestHelper);
 export const createRecipeUseCase = new CreateRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, storageHelper, pdfHelper, externalRequestHelper);
+export const verifyUseCase = new VerifyUseCase(sequelizeRecipeRepository);
 
 export const getController = new GetRecipeController(getRecipeUseCase);
 export const listPatientRecipeController = new ListPatientRecipeController(listPatientRecipeUseCase);
 export const createController = new CreateRecipeController(createRecipeUseCase, sequelizeIllegalRepository);
+export const verifyController = new VerifyController(verifyUseCase);
 
 export const authMiddleware = new AuthMiddleware(sequelizeIllegalRepository, internalRequestHelper);
