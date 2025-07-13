@@ -8,12 +8,40 @@ import QRCode from "qrcode";
 
 export default class RecipePdfHelper implements RecipePdfService {
   
+  private getPuppeteerConfig() {
+    // Configuración para Docker con Alpine Linux - más estable
+    return {
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-renderer-backgrounding',
+        '--disable-ipc-flooding-protection',
+        '--memory-pressure-off',
+        '--max_old_space_size=4096'
+      ],
+      headless: true,
+      timeout: 30000,
+      protocolTimeout: 30000
+    };
+  }
+  
   async generateQrCode(data: string): Promise<ArrayBufferLike> {
     try {
+      console.log("🔍 Generando QR code con datos:", data);
       // Genera el QR como un buffer de imagen PNG
       const buffer = await QRCode.toBuffer(data, {
         type: "png",
-        errorCorrectionLevel: "H",
+        errorCorrectionLevel: "high",
         margin: 1,
         width: 300,
       });
@@ -26,6 +54,7 @@ export default class RecipePdfHelper implements RecipePdfService {
   }
 
   async generatePdf(data: PdfRecipeServiceProps): Promise<ArrayBufferLike> {
+    let browser;
     try {
       console.log(`Medic license A: ${data.practitioner.license}`);
       const htmlPath = path.join(
@@ -70,24 +99,53 @@ export default class RecipePdfHelper implements RecipePdfService {
         medications: data.medications
       };
       
-      const html = template(templateData); // Aquí pasas los datos mapeados al template
+      const html = template(templateData);
 
-      const browser = await puppeteer.launch();
+      // Usar la configuración específica para Docker
+      console.log("🚀 Iniciando Puppeteer...");
+      browser = await puppeteer.launch(this.getPuppeteerConfig());
+      
+      console.log("📄 Creando nueva página...");
       const page = await browser.newPage();
 
-      await page.setContent(html, { waitUntil: "networkidle0" });
+      // Configurar timeouts y límites de memoria
+      await page.setDefaultTimeout(30000);
+      await page.setDefaultNavigationTimeout(30000);
 
+      console.log("🔧 Configurando contenido HTML...");
+      await page.setContent(html, { 
+        waitUntil: "networkidle0",
+        timeout: 30000
+      });
+
+      console.log("📋 Generando PDF...");
       const pdfBuffer = await page.pdf({
         format: "A4",
         printBackground: true,
+        margin: {
+          top: '20px',
+          right: '20px',
+          bottom: '20px',
+          left: '20px'
+        },
+        timeout: 30000
       });
 
-      await browser.close();
-
+      console.log("✅ PDF generado exitosamente");
       return pdfBuffer;
     } catch (error: any) {
       console.error("❌ Error al generar PDF:", error.message);
+      console.error("Stack trace:", error.stack);
       throw new Error("Error al generar PDF");
+    } finally {
+      if (browser) {
+        console.log("🔒 Cerrando browser...");
+        try {
+          await browser.close();
+        } catch (closeError) {
+          console.error("Error al cerrar browser:", closeError);
+        }
+      }
     }
   }
 }

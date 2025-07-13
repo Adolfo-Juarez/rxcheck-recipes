@@ -29,28 +29,47 @@ const s3Client = new S3Client({
 });
 
 export default class StorageHelper implements StorageService {
-async saveFile(file: ArrayBufferLike, folder: FolderType = "recipe"): Promise<StorageDataResponse> {
+  async saveFile(file: ArrayBufferLike, folder: FolderType = "recipe"): Promise<StorageDataResponse> {
     const fileKey = `${folder}/${uuidv4()}.${folder === "recipe" ? "pdf" : "jpg"}`;
+    const contentType = folder === "recipe" ? "application/pdf" : "image/jpeg";
 
-    // Ensure file is a Buffer for S3
+    // Ensure file is a Buffer for S3 with better type handling
     let fileBuffer: Buffer;
-    if (file instanceof Buffer) {
+    
+    console.log("📁 Guardando archivo:", fileKey);
+    console.log("📊 Tipo de archivo recibido:", file.constructor.name);
+    console.log("📏 Tamaño del archivo:", file.byteLength || (file as any).length, "bytes");
+    
+    if (Buffer.isBuffer(file)) {
+      // Ya es un Buffer de Node.js
       fileBuffer = file;
+      console.log("✅ Archivo ya es Buffer de Node.js");
     } else if (file instanceof ArrayBuffer) {
+      // Es un ArrayBuffer, convertir a Buffer
       fileBuffer = Buffer.from(new Uint8Array(file));
+      console.log("🔄 Convertido de ArrayBuffer a Buffer");
+    } else if (file instanceof Uint8Array) {
+      // Es un Uint8Array, convertir a Buffer
+      fileBuffer = Buffer.from(file);
+      console.log("🔄 Convertido de Uint8Array a Buffer");
     } else {
-      // Fallback for other ArrayBufferLike types
+      // Fallback para otros tipos ArrayBufferLike
       fileBuffer = Buffer.from(file as ArrayBufferLike);
+      console.log("🔄 Convertido usando fallback a Buffer");
     }
+
+    console.log("📤 Subiendo a S3 con ContentType:", contentType);
 
     await s3Client.send(
       new PutObjectCommand({
         Bucket: BUCKET_NAME!,
         Key: fileKey,
         Body: fileBuffer,
-        ContentType: folder === "recipe" ? "application/pdf" : "image/jpeg",
+        ContentType: contentType,
       })
     );
+
+    console.log("✅ Archivo subido exitosamente a S3");
 
     const signedUrl = await getSignedUrl(
       s3Client,
@@ -60,6 +79,9 @@ async saveFile(file: ArrayBufferLike, folder: FolderType = "recipe"): Promise<St
       }),
       { expiresIn: 60 * 60 } // 1 hora
     );
+    console.log(fileBuffer);
+
+    console.log("🔗 URL firmada generada:", signedUrl);
 
     return {
       file_location: fileKey,
@@ -68,6 +90,8 @@ async saveFile(file: ArrayBufferLike, folder: FolderType = "recipe"): Promise<St
   }
 
   async getFile(file_location: string): Promise<StorageDataResponse> {
+    console.log("📥 Obteniendo archivo:", file_location);
+    
     const signedUrl = await getSignedUrl(
       s3Client,
       new GetObjectCommand({
@@ -76,6 +100,8 @@ async saveFile(file: ArrayBufferLike, folder: FolderType = "recipe"): Promise<St
       }),
       { expiresIn: 60 * 60 }
     );
+
+    console.log("🔗 URL firmada generada para descarga:", signedUrl);
 
     return {
       file_location,
