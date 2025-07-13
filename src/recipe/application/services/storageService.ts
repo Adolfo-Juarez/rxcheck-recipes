@@ -6,6 +6,6 @@ export interface StorageDataResponse{
 export type FolderType = 'recipe' | 'qr';
 
 export default interface StorageService {
-  saveFile(file: ArrayBufferLike, folder: FolderType): Promise<StorageDataResponse>;
+  saveFile(file: ArrayBufferLike | string, folder: FolderType): Promise<StorageDataResponse>;
   getFile(file_location: string): Promise<StorageDataResponse>;
 }
