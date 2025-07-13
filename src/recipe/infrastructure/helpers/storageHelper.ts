@@ -5,7 +5,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { v4 as uuidv4 } from "uuid";
-import StorageService, { StorageDataResponse } from "../../application/services/storageService";
+import StorageService, { FolderType, StorageDataResponse } from "../../application/services/storageService";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -13,7 +13,6 @@ dotenv.config();
 const {
   BUCKET_SECRET,
   BUCKET_ACCESS_KEY,
-  BUCKET_NAMESPACE,
   BUCKET_REGION,
   BUCKET_NAME,
   BUCKET_ENDPOINT,
@@ -30,15 +29,26 @@ const s3Client = new S3Client({
 });
 
 export default class StorageHelper implements StorageService {
-  async saveFile(file: ArrayBufferLike): Promise<StorageDataResponse> {
-    const fileKey = `${BUCKET_NAMESPACE}/${uuidv4()}.pdf`;
+async saveFile(file: ArrayBufferLike, folder: FolderType = "recipe"): Promise<StorageDataResponse> {
+    const fileKey = `${folder}/${uuidv4()}.${folder === "recipe" ? "pdf" : "jpg"}`;
+
+    // Ensure file is a Buffer for S3
+    let fileBuffer: Buffer;
+    if (file instanceof Buffer) {
+      fileBuffer = file;
+    } else if (file instanceof ArrayBuffer) {
+      fileBuffer = Buffer.from(new Uint8Array(file));
+    } else {
+      // Fallback for other ArrayBufferLike types
+      fileBuffer = Buffer.from(file as ArrayBufferLike);
+    }
 
     await s3Client.send(
       new PutObjectCommand({
         Bucket: BUCKET_NAME!,
         Key: fileKey,
-        Body: Buffer.from(file),
-        ContentType: "application/pdf",
+        Body: fileBuffer,
+        ContentType: folder === "recipe" ? "application/pdf" : "image/jpeg",
       })
     );
 
@@ -57,7 +67,7 @@ export default class StorageHelper implements StorageService {
     };
   }
 
-  async getPdf(file_location: string): Promise<StorageDataResponse> {
+  async getFile(file_location: string): Promise<StorageDataResponse> {
     const signedUrl = await getSignedUrl(
       s3Client,
       new GetObjectCommand({

@@ -52,71 +52,42 @@ EOF
             }
         }
 
-        stage('Crear archivo .env en EC2') {
-            steps {
-                script {
-                    def envContent = ''
-                    try {
-                        // Buscar las variables deseadas directamente
-                        envContent = sh(script: """
-                    env | grep -E '^(NODE_ENV|NODE_NAME|PORT|RABBITMQ_URL|RABBITMQ_QUEUE|MYSQL_|MAIL_|DISCORD_|BUCKET_)'
-                """, returnStdout: true).trim()
-            } catch (Exception e) {
-                        // En caso de error, fallback a búsqueda individual
-                        def individualVars = []
+        stage('Subir archivo .env con variables adicionales') {
+    steps {
+        withCredentials([
+            file(credentialsId: 'default-env-file', variable: 'ENV_FILE'),
+            sshUserPrivateKey(
+                credentialsId: params.CREDENTIAL_ID,
+                keyFileVariable: 'SSH_KEY_FILE',
+                usernameVariable: 'EC2_USER'
+            )
+        ]) {
+            script {
+                // Leer el contenido original del .env
+                def originalEnvContent = readFile("${env.ENV_FILE}")
 
-                        ['NODE_ENV', 'NODE_NAME', 'PORT', 'RABBITMQ_URL', 'RABBITMQ_QUEUE'].each { varName ->
-                            def varValue = sh(script: "echo \$${varName}", returnStdout: true).trim()
-                            if (varValue) {
-                                individualVars.add("${varName}=${varValue}")
-                            }
-                        }
-
-                        ['MYSQL_', 'MAIL_', 'DISCORD_', 'BUCKET_'].each { prefix ->
-                            def found = sh(script: "env | grep '^${prefix}' || true", returnStdout: true).trim()
-                            if (found) {
-                                individualVars.addAll(found.split('\n'))
-                            }
-                        }
-
-                        envContent = individualVars.join('\n')
-                    }
-
-                    // ✅ Agregar manualmente las variables requeridas desde params
-                    envContent += """
-# Variables requeridas
+                // Agregar variables dinámicas o desde parámetros
+                def extraVars = """
+# Variables agregadas dinámicamente
 PORT=${params.CONTAINER_PORT}
 NODE_NAME=${params.APP_KEY}
-""".trim()
+"""
 
-                    // Crear el archivo solo si hay contenido
-                    if (envContent?.trim()) {
-                        writeFile file: 'env_content.sh', text: envContent
+                // Concatenar todo
+                def finalEnvContent = originalEnvContent.trim() + "\n" + extraVars.trim()
 
-                        withCredentials([sshUserPrivateKey(credentialsId: params.CREDENTIAL_ID,
-                                                  keyFileVariable: 'SSH_KEY_FILE',
-                                                  usernameVariable: 'EC2_USER')]) {
-                            sh """
-chmod 600 "$SSH_KEY_FILE"
-ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER@$EC2_HOST" 'cat > ${REMOTE_PATH}/.env' << 'EOF'
-${envContent}
-EOF
-                    """
-                                                  }
-            } else {
-                        // Crear un archivo .env vacío como fallback
-                        withCredentials([sshUserPrivateKey(credentialsId: params.CREDENTIAL_ID,
-                                                  keyFileVariable: 'SSH_KEY_FILE',
-                                                  usernameVariable: 'EC2_USER')]) {
-                            sh """
-chmod 600 "$SSH_KEY_FILE"
-ssh -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no "$EC2_USER@$EC2_HOST" 'echo "# No environment variables found" > ${REMOTE_PATH}/.env'
-                    """
-                                                  }
-                    }
-                }
+                // Guardar en archivo temporal
+                writeFile file: 'combined.env', text: finalEnvContent
+
+                // Subirlo por SSH
+                sh """
+                    chmod 600 "$SSH_KEY_FILE"
+                    scp -i "$SSH_KEY_FILE" -o StrictHostKeyChecking=no combined.env "$EC2_USER@$EC2_HOST:${REMOTE_PATH}/.env"
+                """
             }
         }
+    }
+}
 
         stage('Construir y Desplegar') {
             steps {

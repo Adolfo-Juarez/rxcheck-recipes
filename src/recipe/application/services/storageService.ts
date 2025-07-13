@@ -3,7 +3,9 @@ export interface StorageDataResponse{
     signed_url: string
 }
 
+export type FolderType = 'recipe' | 'qr';
+
 export default interface StorageService {
-  saveFile(file: ArrayBufferLike): Promise<StorageDataResponse>;
-  getPdf(file_location: string): Promise<StorageDataResponse>;
+  saveFile(file: ArrayBufferLike, folder: FolderType): Promise<StorageDataResponse>;
+  getFile(file_location: string): Promise<StorageDataResponse>;
 }

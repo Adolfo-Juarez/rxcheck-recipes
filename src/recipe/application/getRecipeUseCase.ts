@@ -1,13 +1,15 @@
 import RecipeDetailResponse from "../domain/dto/recipeDetailResponse";
 import RecipeMedicationRepository from "../domain/repository/RecipeMedicationRespository";
 import RecipeRepository from "../domain/repository/RecipeRepository";
-import GetMedicationListByIdService from "./services/getMedicationListByIdService";
+import InternalRequestService from "./services/internalRequestService";
+import StorageService from "./services/storageService";
 
 export default class GetRecipeUseCase {
   constructor(
     readonly recipeRepository: RecipeRepository,
     readonly recipeMedicationRepository: RecipeMedicationRepository,
-    readonly getMedicationListByIdHelper: GetMedicationListByIdService
+    readonly getMedicationListByIdHelper: InternalRequestService,
+    readonly storageService: StorageService
   ) {}
   
   async run(id: number): Promise<RecipeDetailResponse | null> {
@@ -35,6 +37,8 @@ export default class GetRecipeUseCase {
       medications: medications.data ? medications.data : [],
       issue_at: recipe.issue_at,
       expires_at: recipe.expires_at,
+      qr_image: (await this.storageService.getFile(recipe.qr_path)).signed_url,
+      pdf_image: (await this.storageService.getFile(recipe.pdf_path)).signed_url,
     } as RecipeDetailResponse;
   }
 }

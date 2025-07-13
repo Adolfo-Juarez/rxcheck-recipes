@@ -3,14 +3,30 @@ import RecipeRepository from "../domain/repository/RecipeRepository";
 import RecipeModel from "./schema/RecipeSchema";
 
 export default class SequelizeRecipeRepository implements RecipeRepository {
+  async checkRecipeExistsById(code: string): Promise<boolean> {
+    try {
+      const recipe = await RecipeModel.findOne({
+        where: {
+          signature: code,
+          is_valid: true,
+        },
+      });
+
+      if (recipe) {
+        recipe.is_valid = false;
+        await recipe.save();
+        return true;
+      }
+
+      return false;
+    } catch (error: any) {
+      return false;
+    }
+  }
+
   async save(recipe: Omit<Recipe, "id">): Promise<Recipe | null> {
     try {
-      const result = await RecipeModel.create({
-        patient_id: recipe.patient_id,
-        doctor_id: recipe.doctor_id,
-        issue_at: recipe.issue_at,
-        expires_at: recipe.expires_at,
-      });
+      const result = await RecipeModel.create(recipe);
       return result.toJSON() as Recipe;
     } catch (error: any) {
       return null;
