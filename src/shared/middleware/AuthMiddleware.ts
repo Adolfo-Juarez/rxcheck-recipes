@@ -56,7 +56,8 @@ export default class AuthMiddleware {
         .json({ message: "Unauthorized", error: "Invalid token" });
     }
 
-    if (this.role) {
+    if (typeof this.role !== "undefined") {
+      console.log(typeof this.role !== "undefined")
       if (user.role !== this.role) {
         return res.status(403).json({
           message: "Forbidden",
@@ -69,13 +70,6 @@ export default class AuthMiddleware {
 
     if (!result) {
       return res.status(404).json({ message: "User not found" });
-    }
-
-    if (this.role !== user.role) {
-      return res.status(403).json({
-        message: "Forbidden",
-        details: `This endpoint is only accessible by "${this.role}" users. You are a "${user.role}" user.`,
-      });
     }
 
     req.user = {

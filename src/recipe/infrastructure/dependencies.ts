@@ -22,7 +22,7 @@ export const sequelizeRecipeRepository = new SequelizeRecipeRepository();
 export const sequelizeRecipeMedicationRepository = new SequelizeRecipeMedicationRepository();
 export const sequelizeIllegalRepository = new SequelizeIllegalRepository();
 
-export const getRecipeUseCase = new GetRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, internalRequestHelper);
+export const getRecipeUseCase = new GetRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, internalRequestHelper, storageHelper);
 export const listPatientRecipeUseCase = new ListPatientRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, internalRequestHelper);
 export const createRecipeUseCase = new CreateRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, storageHelper, pdfHelper, externalRequestHelper);
 
