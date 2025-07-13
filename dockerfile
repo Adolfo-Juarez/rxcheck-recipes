@@ -33,6 +33,8 @@ RUN npm install --only=production
 # Copy built dist folder
 COPY --from=builder /app/dist ./dist
 
+COPY --from=builder /app/src/recipe/assets ./dist/recipe/asset
+
 # Set environment
 ENV NODE_ENV=production
 
