@@ -46,55 +46,39 @@ export default class StorageHelper implements StorageService {
 
     if (typeof file === "string") {
       // Es un string - podría ser base64
-      console.log("🔍 Detectado string, verificando si es base64...");
 
       // Verificar si es base64 válido
       if (this.isBase64(file)) {
-        console.log("✅ String es base64 válido");
         // Remover el prefijo data:image/png;base64, si existe
         const base64Data = file.replace(/^data:image\/[a-z]+;base64,/, "");
         fileBuffer = Buffer.from(base64Data, "base64");
-        console.log("🔄 Convertido de base64 a Buffer");
-        console.log(
-          "📏 Tamaño después de conversión:",
-          fileBuffer.length,
-          "bytes"
-        );
       } else {
         // Si no es base64, asumir que es texto plano
-        console.log("📝 String no es base64, tratando como texto");
+
         fileBuffer = Buffer.from(file, "utf8");
       }
     } else if (Buffer.isBuffer(file)) {
       // Ya es un Buffer de Node.js
       fileBuffer = file;
-      console.log("✅ Archivo ya es Buffer de Node.js");
     } else if (file instanceof ArrayBuffer) {
       // Es un ArrayBuffer, convertir a Buffer
       fileBuffer = Buffer.from(new Uint8Array(file));
-      console.log("🔄 Convertido de ArrayBuffer a Buffer");
     } else if (file instanceof Uint8Array) {
       // Es un Uint8Array, convertir a Buffer
       fileBuffer = Buffer.from(file);
-      console.log("🔄 Convertido de Uint8Array a Buffer");
     } else {
       // Fallback para otros tipos ArrayBufferLike
       fileBuffer = Buffer.from(file as ArrayBufferLike);
-      console.log("🔄 Convertido usando fallback a Buffer");
     }
 
     // Validación adicional para archivos de imagen
     if (folder !== "recipe" && typeof file === "string") {
-      console.log("🖼️ Validando imagen...");
       if (!this.validateImageBuffer(fileBuffer)) {
         console.warn(
           "⚠️ Advertencia: El buffer podría no ser una imagen válida"
         );
       }
     }
-
-    console.log("📤 Subiendo a S3 con ContentType:", contentType);
-    console.log("📏 Tamaño final del buffer:", fileBuffer.length, "bytes");
 
     await s3Client.send(
       new PutObjectCommand({
@@ -105,8 +89,6 @@ export default class StorageHelper implements StorageService {
       })
     );
 
-    console.log("✅ Archivo subido exitosamente a S3");
-
     const signedUrl = await getSignedUrl(
       s3Client,
       new GetObjectCommand({
@@ -115,8 +97,6 @@ export default class StorageHelper implements StorageService {
       }),
       { expiresIn: 60 * 60 } // 1 hora
     );
-
-    console.log("🔗 URL firmada generada:", signedUrl);
 
     return {
       file_location: fileKey,
@@ -144,7 +124,6 @@ export default class StorageHelper implements StorageService {
       // Verificar que la decodificación produzca al menos algunos bytes
       return decoded.length > 0;
     } catch (error: any) {
-      console.log("❌ Error validando base64:", error);
       return false;
     }
   }
@@ -169,18 +148,14 @@ export default class StorageHelper implements StorageService {
 
     for (const [format, signature] of Object.entries(signatures)) {
       if (buffer.subarray(0, signature.length).equals(Buffer.from(signature))) {
-        console.log(`✅ Detectado formato de imagen: ${format.toUpperCase()}`);
         return true;
       }
     }
 
-    console.log("⚠️ No se detectó firma de imagen conocida");
     return false;
   }
 
   async getFile(file_location: string): Promise<StorageDataResponse> {
-    console.log("📥 Obteniendo archivo:", file_location);
-
     const signedUrl = await getSignedUrl(
       s3Client,
       new GetObjectCommand({
@@ -189,8 +164,6 @@ export default class StorageHelper implements StorageService {
       }),
       { expiresIn: 60 * 60 }
     );
-
-    console.log("🔗 URL firmada generada para descarga:", signedUrl);
 
     return {
       file_location,

@@ -24,7 +24,7 @@ export default class GetRecipeUseCase {
         return null
     }
 
-    const medications = await this.getMedicationListByIdHelper.getMedicationListById(recipeMedication.map(e => e.id));
+    const medications = await this.getMedicationListByIdHelper.getMedicationListById(recipeMedication.map(e => e.medication_id));
 
     if (!medications) {
       return null;

@@ -8,7 +8,11 @@ dotenv.config();
 const APP_PORT = process.env.PORT || 3000;
 const server = express();
 
-server.use(cors());
+server.use(cors(
+  {
+    origin: "*"
+  }
+));
 server.use(express.json());
 
 server.use("/recipe", router);
