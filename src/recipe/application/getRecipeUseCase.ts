@@ -32,9 +32,10 @@ export default class GetRecipeUseCase {
 
     return {
       id: recipe.id,
+      status: recipe.status,
       patient_id: recipe.patient_id,
       doctor_id: recipe.doctor_id,
-      medications: medications.data ? medications.data : [],
+      medications: medications.data ? medications.data.map((e,i,a) =>({...e, supplied: recipeMedication.find(k => k.medication_id == e.id)?.supplied})) : [],
       issue_at: recipe.issue_at,
       expires_at: recipe.expires_at,
       qr_image: (await this.storageService.getFile(recipe.qr_path)).signed_url,

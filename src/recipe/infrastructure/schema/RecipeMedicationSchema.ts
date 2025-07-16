@@ -5,6 +5,7 @@ class RecipeMedicationModel extends Model {
   public id!: number;
   public recipe_id!: number;
   public medication_id!: number;
+  public supplied!: boolean;
 }
 
 RecipeMedicationModel.init(
@@ -22,6 +23,11 @@ RecipeMedicationModel.init(
     medication_id: {
       type: DataTypes.INTEGER,
       allowNull: false
+    },
+    supplied: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   },
   {

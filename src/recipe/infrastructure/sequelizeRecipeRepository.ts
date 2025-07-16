@@ -1,26 +1,37 @@
-import Recipe from "../domain/model/Recipe";
+import { Op } from "sequelize";
+import Recipe, { RecipeStatus } from "../domain/model/Recipe";
 import RecipeRepository from "../domain/repository/RecipeRepository";
 import RecipeModel from "./schema/RecipeSchema";
 
 export default class SequelizeRecipeRepository implements RecipeRepository {
-  async checkRecipeExistsById(code: string): Promise<boolean> {
+  async updateStatus(id: number, status: RecipeStatus): Promise<Recipe | null> {
+    try {
+      const recipe = await RecipeModel.findByPk(id);
+      if (!recipe) {
+        console.log(`Recipe ${id} not found. Unable to Update`)
+        return null;
+      }
+      recipe.status = status;
+      await recipe.save();
+      return recipe;
+    } catch (error: any) {
+      console.log("Error updating recipe status:", error);
+      return null;
+    }
+  }
+  async checkRecipeExistsBySign(code: string): Promise<Recipe | null> {
     try {
       const recipe = await RecipeModel.findOne({
         where: {
           signature: code,
-          is_valid: true,
+          status: { [Op.ne]: RecipeStatus.SUPPLIED },
         },
       });
 
-      if (recipe) {
-        recipe.is_valid = false;
-        await recipe.save();
-        return true;
-      }
-
-      return false;
+      return recipe;
     } catch (error: any) {
-      return false;
+      console.log("Error checking recipe by ID:", error);
+      return null;
     }
   }
 

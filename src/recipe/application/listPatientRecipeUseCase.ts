@@ -21,6 +21,7 @@ export default class ListPatientRecipeUseCase {
         return {
             id: r.id,
             expires_at: r.expires_at,
+            status: r.status,
             issue_at: r.issue_at,
             medication_count: await this.recipeMedicationRepository.countMedicationsByRecipeId(r.id),
         } as RecipeOverviewResponse;
