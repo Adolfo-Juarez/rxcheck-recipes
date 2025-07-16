@@ -34,7 +34,14 @@ export class VerifyUseCase {
         status: result.status,
         patient_id: result.patient_id,
         doctor_id: result.doctor_id,
-        medications: medications_details.data ?? [],
+        medications: medications_details.data
+          ? medications_details.data.map((e, i, a) => ({
+              ...e,
+              supplied:
+                medications.find((k) => k.medication_id == e.id)?.supplied ??
+                false,
+            }))
+          : [],
         issue_at: result.issue_at,
         expires_at: result.expires_at,
       };
