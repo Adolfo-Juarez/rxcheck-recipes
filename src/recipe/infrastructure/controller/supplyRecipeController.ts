@@ -11,9 +11,9 @@ export default class SupplyRecipeController {
 
     async run(req: AuthenticatedRequest, res: Response) {
         const { medications } = req.body;
-        const recipe_id = req.params.recipe_id;
+        const recipe_sign = req.params.recipe_id;
 
-        if(!Array.isArray(medications) || typeof recipe_id !== 'string') {
+        if(!Array.isArray(medications) || typeof recipe_sign !== 'string') {
             return res.status(400).json({ message: 'Invalid request' });
         }
 
@@ -23,7 +23,7 @@ export default class SupplyRecipeController {
         };
 
         try {
-            const result = await this.supplyRecipeUseCase.run(medications, recipe_id);
+            const result = await this.supplyRecipeUseCase.run(medications, recipe_sign);
             if (result !== null) {
                 response.data = {
                     is_recipe_completed: result

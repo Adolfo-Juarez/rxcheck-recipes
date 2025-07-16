@@ -8,6 +8,7 @@ export default class SequelizeRecipeRepository implements RecipeRepository {
     try {
       const recipe = await RecipeModel.findByPk(id);
       if (!recipe) {
+        console.log(`Recipe ${id} not found. Unable to Update`)
         return null;
       }
       recipe.status = status;
@@ -18,7 +19,7 @@ export default class SequelizeRecipeRepository implements RecipeRepository {
       return null;
     }
   }
-  async checkRecipeExistsById(code: string): Promise<Recipe | null> {
+  async checkRecipeExistsBySign(code: string): Promise<Recipe | null> {
     try {
       const recipe = await RecipeModel.findOne({
         where: {

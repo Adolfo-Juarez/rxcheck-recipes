@@ -10,7 +10,7 @@ export class VerifyUseCase {
     readonly internalRequestService: InternalRequestService
   ) {}
   async run(code: string): Promise<RecipeDetailResponse | null> {
-    const result = await this.repository.checkRecipeExistsById(code);
+    const result = await this.repository.checkRecipeExistsBySign(code);
     if (result) {
       const medications = await this.medicationRepository.getByRecipeId(
         result.id

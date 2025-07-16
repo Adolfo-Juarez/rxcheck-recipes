@@ -2,7 +2,7 @@ import { MedicationResponse } from "../../application/services/internalRequestSe
 import { RecipeStatus } from "../model/Recipe";
 
 export interface MedicationStatefulResponse extends MedicationResponse {
-  status: RecipeStatus;
+  supplied: boolean;
 }
 
 export default interface RecipeDetailResponse {
