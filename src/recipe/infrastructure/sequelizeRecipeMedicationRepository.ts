@@ -5,6 +5,43 @@ import RecipeMedicationModel from "./schema/RecipeMedicationSchema";
 export default class SequelizeRecipeMedicationRepository
   implements RecipeMedicationRepository
 {
+  async updateSupplied(
+    ids: number[],
+    recipe_id: string
+  ): Promise<boolean | null> {
+    try {
+      
+      const medicationsAvailable = await RecipeMedicationModel.findAll({
+        where: { medication_id: ids, recipe_id: recipe_id, supplied: false },
+      });
+      
+
+      if (medicationsAvailable.length !== ids.length) {
+        return null;
+      }
+
+      // Actualizar todos los registros de una sola vez
+      await RecipeMedicationModel.update(
+        { supplied: true },
+        {
+          where: {
+            medication_id: ids,
+            recipe_id: recipe_id,
+            supplied: false
+          }
+        }
+      );
+
+      const isRecipeCompletlySupplied = await RecipeMedicationModel.findAll({
+        where: { recipe_id: recipe_id },
+      });
+
+      return isRecipeCompletlySupplied.every((m) => m.supplied === true);
+    } catch (error: any) {
+      console.log("Error updating recipe medications: ", error);
+      return null;
+    }
+  }
   async bulkSaveMedicationsToRecipe(
     recipe_id: number,
     medications_ids: number[]

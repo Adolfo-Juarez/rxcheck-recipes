@@ -4,6 +4,7 @@ import {
   createController,
   getController,
   listPatientRecipeController,
+  supplyController,
   verifyController,
 } from "./dependencies";
 
@@ -34,5 +35,11 @@ router.get(
   authMiddleware.withRole("farmacia"),
   verifyController.run.bind(verifyController)
 );
+
+router.post(
+  "/supply/:recipe_id",
+  authMiddleware.withRole("farmacia"),
+  supplyController.run.bind(supplyController)
+)
 
 export default router;
