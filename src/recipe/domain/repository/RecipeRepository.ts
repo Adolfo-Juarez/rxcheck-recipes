@@ -4,5 +4,5 @@ export default interface RecipeRepository {
     save(recipe: Omit<Recipe, 'id'>): Promise<Recipe | null>
     getByPatientId(patient_id: string): Promise<Recipe[] | null>
     getById(id: number): Promise<Recipe | null>
-    checkRecipeExistsById(code: string): Promise<boolean>
+    checkRecipeExistsById(code: string): Promise<Recipe | null>
 }

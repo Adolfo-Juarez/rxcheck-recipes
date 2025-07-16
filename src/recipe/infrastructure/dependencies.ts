@@ -27,7 +27,11 @@ export const sequelizeIllegalRepository = new SequelizeIllegalRepository();
 export const getRecipeUseCase = new GetRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, internalRequestHelper, storageHelper);
 export const listPatientRecipeUseCase = new ListPatientRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, internalRequestHelper);
 export const createRecipeUseCase = new CreateRecipeUseCase(sequelizeRecipeRepository, sequelizeRecipeMedicationRepository, storageHelper, pdfHelper, externalRequestHelper);
-export const verifyUseCase = new VerifyUseCase(sequelizeRecipeRepository);
+export const verifyUseCase = new VerifyUseCase(
+    sequelizeRecipeRepository,
+    sequelizeRecipeMedicationRepository,
+    internalRequestHelper
+);
 
 export const getController = new GetRecipeController(getRecipeUseCase);
 export const listPatientRecipeController = new ListPatientRecipeController(listPatientRecipeUseCase);

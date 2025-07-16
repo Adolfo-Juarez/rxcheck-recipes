@@ -3,7 +3,7 @@ import RecipeRepository from "../domain/repository/RecipeRepository";
 import RecipeModel from "./schema/RecipeSchema";
 
 export default class SequelizeRecipeRepository implements RecipeRepository {
-  async checkRecipeExistsById(code: string): Promise<boolean> {
+  async checkRecipeExistsById(code: string): Promise<Recipe | null> {
     try {
       const recipe = await RecipeModel.findOne({
         where: {
@@ -12,15 +12,10 @@ export default class SequelizeRecipeRepository implements RecipeRepository {
         },
       });
 
-      if (recipe) {
-        recipe.is_valid = false;
-        await recipe.save();
-        return true;
-      }
-
-      return false;
+      return recipe;
     } catch (error: any) {
-      return false;
+      console.log("Error checking recipe by ID:", error);
+      return null;
     }
   }
 
