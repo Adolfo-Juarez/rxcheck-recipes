@@ -32,6 +32,7 @@ export default class GetRecipeUseCase {
 
     return {
       id: recipe.id,
+      status: recipe.status,
       patient_id: recipe.patient_id,
       doctor_id: recipe.doctor_id,
       medications: medications.data ? medications.data : [],

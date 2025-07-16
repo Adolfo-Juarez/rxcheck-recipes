@@ -1,5 +1,6 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../../../database/sequelize";
+import { RecipeStatus } from "../../domain/model/Recipe";
 
 class RecipeModel extends Model {
   public id!: number;
@@ -10,7 +11,7 @@ class RecipeModel extends Model {
   public qr_path!: string;
   public pdf_path!: string;
   public signature!: string;
-  public is_valid!: boolean;
+  public status!: RecipeStatus;
 }
 
 RecipeModel.init(
@@ -49,10 +50,11 @@ RecipeModel.init(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    is_valid: {
-      type: DataTypes.BOOLEAN,
+    status: {
+      type: DataTypes.ENUM,
       allowNull: false,
-      defaultValue: true,
+      defaultValue: RecipeStatus.PENDING,
+      values: ["pending", "partially_supplied", "supplied"]
     },
   },
   {

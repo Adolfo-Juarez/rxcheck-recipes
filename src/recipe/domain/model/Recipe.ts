@@ -1,3 +1,9 @@
+export enum RecipeStatus {
+    PENDING = "pending",
+    PARTIALLY_SUPPLIED = "partially_supplied",
+    SUPPLIED = "supplied"
+}
+
 export default interface Recipe {
     id: number;
     patient_id: string;
@@ -7,6 +13,6 @@ export default interface Recipe {
     qr_path: string;
     pdf_path: string;
     signature: string;
-    is_valid: boolean;
+    status: RecipeStatus;
 }
 

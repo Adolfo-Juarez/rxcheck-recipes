@@ -31,6 +31,7 @@ export class VerifyUseCase {
 
       return {
         id: result.id,
+        status: result.status,
         patient_id: result.patient_id,
         doctor_id: result.doctor_id,
         medications: medications_details.data ?? [],

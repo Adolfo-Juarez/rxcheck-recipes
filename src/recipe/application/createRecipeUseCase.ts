@@ -1,5 +1,5 @@
 import SaveRecipeRequest from "../domain/dto/saveRecipeRequest";
-import Recipe from "../domain/model/Recipe";
+import Recipe, { RecipeStatus } from "../domain/model/Recipe";
 import RecipeMedicationRepository from "../domain/repository/RecipeMedicationRespository";
 import RecipeRepository from "../domain/repository/RecipeRepository";
 import ExternalRequestHelper from "../infrastructure/helpers/externalRequestHelper";
@@ -77,7 +77,7 @@ export default class CreateRecipeUseCase {
       qr_path: qrCodePath.file_location,
       pdf_path: presigned_uri.file_location,
       signature: super_secret_signature,
-      is_valid: true
+      status: RecipeStatus.PENDING
     };
 
     console.log(presigned_uri)
