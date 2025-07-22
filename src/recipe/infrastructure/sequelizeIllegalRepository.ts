@@ -35,7 +35,9 @@ export default class SequelizeIllegalRepository implements IllegalRepository {
      apellido_materno,
      curp,
      rfc,
-     email
+     email,
+     telefono,
+     domicilio
      FROM users
      WHERE id = $1
      LIMIT 1

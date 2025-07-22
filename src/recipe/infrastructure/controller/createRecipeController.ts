@@ -7,11 +7,13 @@ import IllegalRepository from "../../domain/repository/IllegalRepository";
 import CreateRecipeRequest, {
   validateSchema,
 } from "../../domain/dto/createRecipeRequest";
+import InternalRequestService from "../../application/services/internalRequestService";
 
 export default class CreateRecipeController {
   constructor(
     readonly createRecipeUseCase: CreateRecipeUseCase,
-    readonly illegalRepository: IllegalRepository
+    readonly illegalRepository: IllegalRepository,
+    readonly internalService: InternalRequestService
   ) {}
 
   async run(req: AuthenticatedRequest, res: Response) {
@@ -55,6 +57,15 @@ export default class CreateRecipeController {
       return res.status(400).json(response);
     }
     console.log(`Medic license A: ${medicLicense}`);
+    const medications = await this.internalService.getMedicationListById(
+      data.medications.map((med) => med.id)
+    );
+
+    if (!medications || !medications.data || medications.data.length === 0) {
+      response.message = "Error fetching medications";
+      return res.status(400).json(response);
+    }
+
     const result = await this.createRecipeUseCase.run({
       patient: {
         id: data.patient.id,
@@ -70,16 +81,18 @@ export default class CreateRecipeController {
         id: req.user?.id ?? "",
         full_name: `${req.user?.name} ${req.user?.lastname}`.trim(),
         license: medicLicense,
+        phone: req.user?.phone,
+        place: req.user?.address,
       },
-      medications: data.medications.map((med) => ({
-        dosis: med.dosis,
-        duration: med.duration,
+      medications: medications.data.map((med) => ({
+        dosis: data.medications.find((m) => m.id === med.id)?.dosis ?? "",
+        duration: data.medications.find((m) => m.id === med.id)?.duration ?? "",
         id: med.id,
-        name: "",
-        strength: "",
-        form: "",
-        via: "",
-        frecuency: "",
+        name: med.name,
+        strength: med.strength,
+        form: med.form,
+        via: med.form,
+        frecuency: data.medications.find((m) => m.id === med.id)?.dosis ?? "",
         instruction: med.indication,
       })),
     });
