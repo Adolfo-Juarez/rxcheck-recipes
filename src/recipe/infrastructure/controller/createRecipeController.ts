@@ -91,9 +91,9 @@ export default class CreateRecipeController {
         name: med.name,
         strength: med.strength,
         form: med.form,
-        via: med.form,
+        via: med.indication,
         frecuency: data.medications.find((m) => m.id === med.id)?.dosis ?? "",
-        instruction: med.indication,
+        instruction: data.medications.find((m) => m.id === med.id)?.indication ?? "",
       })),
     });
 
