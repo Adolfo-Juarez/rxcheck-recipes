@@ -22,7 +22,7 @@ export class VerifyUseCase {
 
       const medications_details =
         await this.internalRequestService.getMedicationListById(
-          medications.map((e) => e.id)
+          medications.map((e) => e.medication_id)
         );
 
       if (!medications_details) {
