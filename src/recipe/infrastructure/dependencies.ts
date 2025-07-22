@@ -34,7 +34,7 @@ export const supplyRecipeUseCase = new SupplyRecipeUseCase(sequelizeRecipeMedica
 
 export const getController = new GetRecipeController(getRecipeUseCase);
 export const listPatientRecipeController = new ListPatientRecipeController(listPatientRecipeUseCase);
-export const createController = new CreateRecipeController(createRecipeUseCase, sequelizeIllegalRepository);
+export const createController = new CreateRecipeController(createRecipeUseCase, sequelizeIllegalRepository, internalRequestHelper);
 export const verifyController = new VerifyController(verifyUseCase);
 export const supplyController = new SupplyRecipeController(supplyRecipeUseCase);
 

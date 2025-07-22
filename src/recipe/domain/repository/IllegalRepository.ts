@@ -5,6 +5,8 @@ export interface UserIllegal {
   curp: string;
   rfc: string;
   email: string;
+  telefono?: string;
+  domicilio?: string;
 }
 
 export enum ProfessionalSex {

@@ -12,6 +12,8 @@ export interface AuthUserMiddleware {
   curp: string;
   rfc: string;
   email: string;
+  phone?: string;
+  address?: string;
 }
 
 export interface AuthenticatedRequest extends Request {
@@ -80,6 +82,8 @@ export default class AuthMiddleware {
       curp: result.curp,
       rfc: result.rfc,
       email: result.email,
+      phone: result.telefono,
+      address: result.domicilio,
     };
 
     return next();
