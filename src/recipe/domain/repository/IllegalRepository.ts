@@ -18,4 +18,5 @@ export default interface IllegalRepository {
   findUserById(id: string): Promise<UserIllegal | null>;
   doesUserExistsWithId(id: string): Promise<boolean>;
   getMedicLicenseFromId(id: string): Promise<string | null>;
+  registerIncidences(recipe_medication_id: number[]): Promise<void>;
 }

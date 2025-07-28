@@ -1,4 +1,3 @@
-import { Op } from "sequelize";
 import Recipe, { RecipeStatus } from "../domain/model/Recipe";
 import RecipeRepository from "../domain/repository/RecipeRepository";
 import RecipeModel from "./schema/RecipeSchema";
@@ -24,7 +23,6 @@ export default class SequelizeRecipeRepository implements RecipeRepository {
       const recipe = await RecipeModel.findOne({
         where: {
           signature: code,
-          status: { [Op.ne]: RecipeStatus.SUPPLIED },
         },
       });
 

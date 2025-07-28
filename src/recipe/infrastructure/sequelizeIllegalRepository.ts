@@ -3,11 +3,38 @@ import IllegalRepository, {
   UserIllegal,
 } from "../domain/repository/IllegalRepository";
 import { UserRoles } from "../../recipe/application/services/internalRequestService";
+import IncidenceModel from "./schema/IncidenceSchema";
+import { Op } from "sequelize";
+import RecipeMedicationModel from "./schema/RecipeMedicationSchema";
 
 export default class SequelizeIllegalRepository implements IllegalRepository {
+  async registerIncidences(recipe_medication_id: number[]): Promise<void> {
+    try {
+      console.log(`Registering incidences for recipe medication ids: ${recipe_medication_id}`);
+      const existantRecipeMedicationIds = await RecipeMedicationModel.findAll({
+        where: {
+          medication_id: {
+            [Op.in]: recipe_medication_id,
+          },
+        },
+      });
+      
+      console.log(`Existant recipe medication ids: ${existantRecipeMedicationIds}`);
+
+      IncidenceModel.bulkCreate(
+        existantRecipeMedicationIds.map((id) => ({
+          recipe_medication_id: id.id,
+          created_at: new Date(),
+        }))
+      );
+
+    } catch (error) {
+      console.log("Error registering incidences: ", error);
+    }
+  }
   async getMedicLicenseFromId(id: string): Promise<string | null> {
-    try{
-      const result = await sequelize.query(
+    try {
+      const result = (await sequelize.query(
         `
      SELECT
      cedula_profesional
@@ -17,11 +44,11 @@ export default class SequelizeIllegalRepository implements IllegalRepository {
      LIMIT 1
     `,
         {
-          bind: [id, ("medico" as UserRoles) ],
+          bind: [id, "medico" as UserRoles],
         }
-      ) as any;
+      )) as any;
       return result[0][0].cedula_profesional;
-    }catch(error: any){
+    } catch (error: any) {
       return null;
     }
   }
