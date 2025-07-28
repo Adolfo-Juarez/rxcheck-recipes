@@ -8,21 +8,22 @@ export default class SequelizeRecipeMedicationRepository
   async updateSupplied(
     ids: number[],
     recipe_id: string
-  ): Promise<boolean | null> {
+  ): Promise<boolean | number[]> {
     try {
       
       const medicationsAvailable = await RecipeMedicationModel.findAll({
-        where: { medication_id: ids, recipe_id: recipe_id, supplied: false },
+        where: { recipe_id: recipe_id, supplied: false },
       });
       
 
       if (medicationsAvailable.length !== ids.length) {
-        return null;
+        console.log(`The amount of medications available is not the same as the amount of medications to be supplied:\n > Medications available: [${medicationsAvailable.map((m)=> m.medication_id).join(", ")}] \n > Medications to be supplied: [${ids.join(", ")}]`);
+        return medicationsAvailable.filter((m)=> !ids.includes(m.medication_id)).map((m)=> m.medication_id);
       }
 
       // Actualizar todos los registros de una sola vez
       await RecipeMedicationModel.update(
-        { supplied: true },
+        { supplied: true, supplied_at: new Date() },
         {
           where: {
             medication_id: ids,
@@ -39,7 +40,7 @@ export default class SequelizeRecipeMedicationRepository
       return isRecipeCompletlySupplied.every((m) => m.supplied === true);
     } catch (error: any) {
       console.log("Error updating recipe medications: ", error);
-      return null;
+      return [];
     }
   }
   async bulkSaveMedicationsToRecipe(
